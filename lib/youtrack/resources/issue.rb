@@ -3,6 +3,8 @@ require 'net/http/post/multipart'
 module Youtrack
   class Issue < Base
 
+    require "rexml/document"
+    include REXML
 
     # ==================
     # USER Methods
@@ -157,6 +159,26 @@ module Youtrack
     #
     def apply_command(issue_id, attributes={})
       post("issue/#{issue_id}/execute", query: attributes)
+      response
+    end
+
+    # Edit Work Item
+    #
+    # issue_id      string  youtrack ticket id
+    # work_item_id  string  youtrack work item ID
+    # attributes    hash
+    #      date         string  date and time of the new work item in ISO8601 time format (defaults to current date)
+    #      duration     string  Duration of the work item in minutes
+    #      description  string  Activity description
+    #
+    def edit_work_item(issue_id, work_item_id, attributes={})
+      attributes = attributes.to_hash
+      attributes.symbolize_keys!
+      work_item = REXML::Element.new('workItem')
+      work_item.add_element('date').add_text((Date.parse(attributes[:date]).to_time.to_i * 1000).to_s) if attributes[:date]
+      work_item.add_element('duration').add_text(attributes[:duration].to_s) if attributes[:duration]
+      work_item.add_element('description').add_text(attributes[:description]) if attributes[:description]
+      put("issue/#{issue_id}/timetracking/workitem/#{work_item_id}", body: work_item.to_s, :headers => {'Content-type' => 'text/xml'} )
       response
     end
   end
