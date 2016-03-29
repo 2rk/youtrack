@@ -122,6 +122,15 @@ module Youtrack
       response.parsed_response
     end
 
+    # Delete Work Item
+    #
+    # issue_id      string  youtrack ticket id
+    # work_item_id  string  youtrack work item ID
+    def delete_work_item(issue_id, work_item_id)
+      delete("issue/#{issue_id}/timetracking/workitem/#{work_item_id}")
+      response
+    end
+
     # Add new work item to issue
     #
     # issue_id   string  youtrack ticket id
