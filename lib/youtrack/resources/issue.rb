@@ -205,6 +205,22 @@ module Youtrack
     #      duration     string  Duration of the work item in minutes
     #      description  string  Activity description
 
+    def add_work_item_to(issue_id, attributes={})
+      attributes = attributes.to_hash
+      attributes.symbolize_keys!
+      attributes[:date] ||= Date.current.iso8601
+      epoc_date = Date.parse(attributes[:date]).to_time.to_i * 1000
+      attributes[:user] ||= self.service.login
+      work_items = REXML::Element.new('workItems')
+      work_item = work_items.add_element('workItem')
+      work_item.add_element('author').add_attribute('login', attributes[:user])
+      work_item.add_element('date').add_text(epoc_date.to_s)
+      work_item.add_element('duration').add_text(attributes[:duration].to_s)
+      work_item.add_element('description').add_text(attributes[:description])
+      Rails.logger.info work_items.to_s
+      put("import/issue/#{issue_id}/workitems", body: work_items.to_s, :headers => {'Content-type' => 'text/xml'} ).code == 200
+    end
+
     def add_work_item(issue_id, attributes={})
       attributes = attributes.to_hash
       attributes.symbolize_keys!
