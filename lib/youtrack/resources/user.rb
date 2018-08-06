@@ -38,8 +38,8 @@ module Youtrack
       response.parsed_response
     end
 
-    def all
-      get("admin/user")
+    def all(attributes={})
+      get("admin/user?#{URI.encode_www_form(attributes)}")
       response.parsed_response
     end
     
