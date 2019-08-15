@@ -8,10 +8,14 @@ module Youtrack
     # stores the Server login credential
     # defaults to nil
     attr_accessor :login
-      
+
     # stores the Server password credential
     # defaulst to nil
     attr_accessor :password
+
+    # stores the Server password credential
+    # defaults to nil
+    attr_accessor :api_token
 
     # stores the response object
     attr_accessor :connection
@@ -48,12 +52,14 @@ module Youtrack
 
 
     # Makes a login call and sets the Cookie headers
-    # 
+    #
     # Returns the status code of the connection call
     def connect!
-      @connection = HTTParty.post(File.join(url, "rest/user/login"), body: credentials_hash )
-      @cookies['Cookie'] = @connection.headers['set-cookie']
-      @connection.code
+      unless api_token.present?
+        @connection = HTTParty.post(File.join(url, "rest/user/login"), body: credentials_hash )
+        @cookies['Cookie'] = @connection.headers['set-cookie']
+        @connection.code
+      end
     end
 
     def connected?

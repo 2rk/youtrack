@@ -26,10 +26,16 @@ module Youtrack
 
       def prepare_options(options={})
         options[:headers] ||= {}
-        options[:headers]['Cookie'] = service.cookies['Cookie']
+        if service.api_token.present?
+          options[:headers]['Content-Type'] = 'application/json'
+          options[:headers]['Accept'] = 'application/json'
+          options[:headers]['Authorization'] = "Bearer #{service.api_token}"
+        else
+          options[:headers]['Cookie'] = service.cookies['Cookie']
+        end
         options
       end
-      
+
       def post(path, options={})
         options = prepare_options(options)
         @response = self.class.post( join(base_url, path), options )
