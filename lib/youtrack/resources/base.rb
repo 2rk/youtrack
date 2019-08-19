@@ -27,8 +27,6 @@ module Youtrack
       def prepare_options(options={})
         options[:headers] ||= {}
         if service.api_token.present?
-          options[:headers]['Content-Type'] = 'application/json'
-          options[:headers]['Accept'] = 'application/json'
           options[:headers]['Authorization'] = "Bearer #{service.api_token}"
         else
           options[:headers]['Cookie'] = service.cookies['Cookie']
